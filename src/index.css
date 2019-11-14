@@ -1,0 +1,149 @@
+@import url('https://fonts.googleapis.com/css?family=Ubuntu+Condensed&display=swap');
+
+:root {
+    --accent-color: #00a7ab;
+    --accent-color-2: #0087ab;
+    --grey-color: #aaa;
+    --grey-color-dark: #777;
+}
+
+body {
+    margin: 0;
+    padding: 0;
+    font-family: 'Ubuntu Condensed', sans-serif;
+    background-image: url(img/back.jpg);
+}
+
+h1 {
+    padding-top: 5rem;
+}
+
+h3 {
+    padding-top: 2rem;
+}
+
+.logo-img {
+    width: 2rem;
+    height: 2rem;
+    margin-right: 1rem;
+}
+
+.login-form {
+    margin: auto;
+    vertical-align: middle;
+    border: none;
+    height: fit-content;
+    justify-content: center;
+    padding: 3rem;
+}
+
+.form-content {
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.avatar {
+    width: 6rem;
+    height: 6rem;
+    background-color: var(--accent-color);
+    border-radius: 50%;
+    color: white;
+    vertical-align: middle !important;
+    display: flex;
+    align-items: center;
+}
+
+.avatar-div {
+    top: 3rem;
+    position: relative;
+    z-index: 1;
+}
+
+.nav-avatar{
+    width: 2.5rem;
+    height: 2.5rem;
+    background-color: var(--accent-color);
+    border-radius: 50%;
+    color: white;
+    vertical-align: middle !important;
+    display: flex;
+    align-items: center;
+}
+
+.nav-avatar-div {
+    padding-right: 2rem;
+    padding-left: 2rem;
+}
+
+.nav-avatar-link{
+    color: var(--grey-color-dark);
+    padding-left: 1.5rem;
+}
+
+.login-input {
+    margin: .5rem;
+    border: none;
+    border-radius: .25rem;
+    background-color: #eee;
+    padding: .5rem;
+    text-align: center;
+    width: 100%;
+}
+
+.login-button {
+    background-color: var(--accent-color);
+    border: none;
+    font-size: 1.3rem;
+    padding-left: 3rem;
+    padding-right: 3rem;
+    width: auto;
+    margin-top: 1.5rem;
+}
+
+.login-button:hover {
+    background-color: var(--accent-color-2);
+}
+
+.login-button:disabled {
+    background-color: var(--grey-color);
+}
+
+.text-link {
+    color: var(--accent-color);
+}
+
+a:hover {
+    color: var(--accent-color-2);
+}
+
+p {
+    margin-top: 1.5rem;
+}
+
+.login-h2 {
+    margin-top: 2rem;
+    margin-bottom: 1.5rem;
+    font-weight: lighter;
+}
+
+.radio-check {
+    padding-top: 1rem;
+    padding-bottom: 1rem;
+}
+
+.nav-btn{
+    background-color: white;
+    color: var(--grey-color-dark);
+    border: 1px solid var(--grey-color);
+    padding-left: 1rem;
+    padding-right: 1rem;
+    width: auto;
+}
+
+.nav-btn:hover{
+    border: 1px solid black;
+}
+
+
+
+
