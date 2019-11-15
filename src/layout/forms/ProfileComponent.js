@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
 import ProfileSchema from "./schemaValidation/ProfileSchemaValidation";
-import {faUserEdit} from "@fortawesome/free-solid-svg-icons";
+import {faSpinner, faUserEdit} from "@fortawesome/free-solid-svg-icons";
 import UserInput from "../UI/UserInputComponent";
 import Avatar from "../UI/AvatarComponent";
 import {Form, Field, Formik} from "formik";
@@ -9,34 +9,21 @@ import PropTypes from "prop-types";
 import {connect} from "react-redux";
 import {updateUser, getUser} from "../../actions/authActions";
 import {withRouter} from "react-router-dom";
+import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 
 class Profile extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            test: '',
             loading: true,
-            user: {
-                name: '',
-                age: '',
-                gender: '',
-            },
-            newValue: '',
         };
     }
 
     componentDidMount() {
         this.props.getUser();
-        setTimeout(()=>{
-            this.setState({test: '4564545'})
-        }, 2000)
-
     }
 
     UNSAFE_componentWillReceiveProps(nextProps) {
-        let userData = nextProps.auth.userData;
-        this.setState({user: userData});
-
         if (nextProps.errors) {
             this.setState({
                 errors: nextProps.errors
@@ -45,25 +32,23 @@ class Profile extends Component {
     }
 
     onSubmit = (message) => {
-        console.log(message)
         this.props.updateUser(message);
     };
 
     render() {
         let userData = this.props.auth.userData;
-        const loading = !!userData._id ? false : true;
+        const loading = !userData._id;
         userData = userData || {name: '', age: ''};
-        console.log('AAAAAAAAAA', userData, loading)
-        const name = userData.name ;
+
         return (
             <div className="center-block">
-                <h1>{loading ? "LOADING....." : ""}</h1>
+                <h2 className="row justify-content-center login-h2">{loading ? <FontAwesomeIcon icon={faSpinner} spin size="2x" /> : ""}</h2>
                 {!loading && <Avatar icon={faUserEdit}/>}
                 {!loading && <Formik
                     validationSchema={ProfileSchema}
                     validateOnChange={false}
                     onSubmit={this.onSubmit}
-                    initialValues={{name: name , age: userData.age || '', gender: userData.gender || 'Not Specified' }}
+                    initialValues={{name: userData.name , age: userData.age || '', gender: userData.gender || 'Not Specified' }}
                 >
                     <Form className="form-container form-control login-form col-md-6 col-lg-5">
                         <span className="row justify-content-center"><h2 className="login-h2">Personal data</h2></span>

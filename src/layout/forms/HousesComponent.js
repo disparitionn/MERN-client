@@ -1,150 +1,75 @@
 import React, {Component} from 'react';
 import HousesSchema from "./schemaValidation/HousesSchemaValidation";
 import Select from 'react-select'
-import {faEdit} from "@fortawesome/free-solid-svg-icons";
-import axios from 'axios';
+import {faEdit, faSpinner} from "@fortawesome/free-solid-svg-icons";
 import UserInput from "../UI/UserInputComponent";
 import Avatar from "../UI/AvatarComponent";
 import {Form, Formik} from "formik";
 import SubmitButton from "../UI/SubmitButtonComponent";
+import PropTypes from "prop-types";
+import {connect} from "react-redux";
+import {updateHouse, getAllHouses} from "../../actions/houseActions";
+import {withRouter} from "react-router-dom";
+import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 
 class Houses extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            selectedHouse: {value: "", label: ""},
-            selectedRoom: {value: "", label: ""},
-            optionsHouses: [],
-            optionsRooms: [],
-            newValue: {name: '', value: ''},
-            newHouseValue: '',
-            newRoomValue: '',
+            optionsHouses: {},
+            selectedHouse: {},
         };
-        this.handleHouseChange = this.handleHouseChange.bind(this);
-        this.handleRoomChange = this.handleRoomChange.bind(this);
-        this.editHouse = this.editHouse.bind(this);
-        this.getNewValue = this.getNewValue.bind(this);
     };
-    componentDidMount() {
-        this.setHouses();
 
-        if (this.props.auth.isAuthenticated) {
-            this.props.history.push("/dashboard");
+    componentDidMount() {
+        this.props.getAllHouses();
+        setTimeout(()=>{
+            this.setHouses();
+        }, 3000)
+    }
+
+    UNSAFE_componentWillReceiveProps(nextProps) {
+        if (nextProps.errors) {
+            this.setState({
+                errors: nextProps.errors
+            });
         }
     }
 
-    updateDB = (idToUpdate, updateToApply) => {
-        let objIdToUpdate = null;
-        parseInt(idToUpdate);
-        this.state.data.forEach((dat) => {
-            if (dat.id === idToUpdate) {
-                objIdToUpdate = dat._id;
-            }
-        });
-
-        axios.post('http://localhost:3001/api/updateData', {
-            id: objIdToUpdate,
-            update: { message: updateToApply },
-        });
-    };
-
-    getNewValue = (name, value) => {
-        console.log(name, value)
-        let {newValue} = this.state;
-        console.log('newValue', newValue)
-        newValue.name = name;
-        newValue.value = value;
-
-        this.setState(newValue);
-        console.log('newValue', newValue)
-    };
-
-    getNewRoomValue = e => {
-        if (this.state.selectedRoom.value !== '') {
-            this.setState({newRoomValue: e.target.value});
-        }
-    };
-
-    editHouse = e => {
-        let arr = this.state.home;
-        let indexOfHouse = arr.findIndex(
-            item => item.id === this.state.selectedHouse.value);
-        arr[indexOfHouse].id = this.state.newValue.value;
-
-        this.editRoom(arr, indexOfHouse);
-        this.setState({home: arr});
-        console.log('home', this.state.home);
-        this.updateSelector();
-    };
-
-    editRoom = (arr, indexOfHouse) => {
-        if (this.state.selectedRoom.value !== '') {
-            let room = arr[indexOfHouse].rooms.findIndex(
-                item => item.roomName === this.state.selectedRoom.value);
-            arr[indexOfHouse].rooms[room].roomName = this.state.newRoomValue;
-        }
-    };
-
-    updateSelector = async () => {
-        await this.setState((state) => ({selectedHouse: {value: state.newValue.value, label: state.newValue.value}}));
-        await this.setState((state) => ({selectedRoom: {value: state.newRoomValue, label: state.newRoomValue}}));
-
-        //this.clearHouses();
-        this.setHouses();
-        this.setRooms();
-    };
-
-    onValChange = e => {
-        this.setState({newValue: {value: e.target.value}});
-        console.log('newValue', this.state.newValue)
-    };
-
     setHouses = () => {
-        let houses = this.state.home.map(item => {
-            return {value: item.id, label: item.id};
+        let houseData = this.props.houses.houseData;
+        console.log('setHouses houseData', houseData)
+        let houses = this.props.houses.houseData.map(item => {
+            return {value: item.homeName, label: item.homeName};
         });
         this.setState({optionsHouses: houses});
     };
 
     handleHouseChange = async selectedHouse => {
-        this.clearRooms();
-        await this.setState({selectedHouse});
-        this.setRooms();
+        //this.clearRooms();
+        await this.setState({selectedHouse: selectedHouse});
+        console.log(this.state.selectedHouse)
+        //this.setRooms();
     };
 
-    clearHouses = () => {
-        this.setState({selectedHouse: {value: "", label: ""}});
-        this.setState({optionsHouses: []});
-    };
-
-    clearRooms = () => {
-        this.setState({selectedRoom: {value: "", label: ""}});
-        this.setState({optionsRooms: []});
-    };
-
-    setRooms = () => {
-            let house = this.state.home.find(item => item.id === this.state.selectedHouse.value);
-            let rooms = house.rooms.map(item => {
-                return {value: item.roomName, label: item.roomName}
-            });
-            this.setState({optionsRooms: rooms});
-
-    };
-
-    handleRoomChange = selectedRoom => {
-        this.setState({selectedRoom});
+    onSubmit = (message) =>{
+        console.log(message)
+        this.props.updateHouse(message);
     };
 
     render() {
+        let houseData = this.props.houses.houseData;
+        const loading = !this.state.optionsHouses[0];
+        houseData = houseData || {homeName: ''};
 
         return (
-
             <div className="center-block">
-                <Avatar icon={faEdit}/>
-                <Formik
+                <h2 className="row justify-content-center login-h2">{loading ? <FontAwesomeIcon icon={faSpinner} spin size="2x" /> : ""}</h2>
+                {!loading && <Avatar icon={faEdit}/>}
+                {!loading && <Formik
                     validationSchema={HousesSchema}
                     validateOnChange={false}
-                    onSubmit={this.putDataToDB}
+                    onSubmit={this.onSubmit}
                     initialValues={{}}>
 
                     <Form className="form-container form-control login-form col-md-6 col-lg-5">
@@ -166,10 +91,31 @@ class Houses extends Component {
                             </div>
                         </div>
                     </Form>
-                </Formik>
+                </Formik>}
             </div>
         )
     }
 }
 
-export default Houses;
+
+Houses.propTypes = {
+    updateHouse: PropTypes.func.isRequired,
+    getAllHouses: PropTypes.func.isRequired,
+    houses: PropTypes.object.isRequired,
+    errors: PropTypes.object.isRequired,
+};
+const mapStateToProps = state => ({
+    houses: state.houses,
+    errors: state.errors,
+});
+
+function mapDispatchToProps(dispatch) {
+    return {
+        updateHouse: message => dispatch(updateHouse(message)),
+        getAllHouses: () => dispatch(getAllHouses())
+    }
+}
+export default connect(
+    mapStateToProps,
+    mapDispatchToProps
+)(withRouter(Houses));
