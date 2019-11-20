@@ -2,13 +2,13 @@ import React, {Component} from 'react';
 import HousesSchema from "./schemaValidation/HousesSchemaValidation";
 import Select from 'react-select'
 import {faEdit, faSpinner} from "@fortawesome/free-solid-svg-icons";
-import UserInput from "../UI/UserInputComponent";
+import HouseInput from "../UI/HouseInputComponent";
 import Avatar from "../UI/AvatarComponent";
 import {Form, Formik} from "formik";
 import SubmitButton from "../UI/SubmitButtonComponent";
 import PropTypes from "prop-types";
 import {connect} from "react-redux";
-import {updateHouse, getAllHouses} from "../../actions/houseActions";
+import {updateHouse, getAllHouses, setCurrentHouse} from "../../actions/houseActions";
 import {withRouter} from "react-router-dom";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 
@@ -18,14 +18,15 @@ class Houses extends Component {
         this.state = {
             optionsHouses: {},
             selectedHouse: {},
+            newValue: {name: '', value: ''},
         };
     };
 
     componentDidMount() {
         this.props.getAllHouses();
-        setTimeout(()=>{
+        setTimeout(() => {
             this.setHouses();
-        }, 3000)
+        }, 2000)
     }
 
     UNSAFE_componentWillReceiveProps(nextProps) {
@@ -37,10 +38,8 @@ class Houses extends Component {
     }
 
     setHouses = () => {
-        let houseData = this.props.houses.houseData;
-        console.log('setHouses houseData', houseData)
         let houses = this.props.houses.houseData.map(item => {
-            return {value: item.homeName, label: item.homeName};
+            return {value: item.id, label: item.homeName};
         });
         this.setState({optionsHouses: houses});
     };
@@ -48,23 +47,37 @@ class Houses extends Component {
     handleHouseChange = async selectedHouse => {
         //this.clearRooms();
         await this.setState({selectedHouse: selectedHouse});
-        console.log(this.state.selectedHouse)
+        await this.props.setCurrentHouse(selectedHouse);
         //this.setRooms();
     };
+    getNewValue = (name, value) => {
+        console.log(name, value)
+        let {newValue} = this.state;
+        console.log('newValue', newValue)
+        newValue.name = name;
+        newValue.value = value;
 
-    onSubmit = (message) =>{
-        console.log(message)
-        this.props.updateHouse(message);
+        this.setState(newValue);
+        console.log('newValue', newValue)
+    };
+
+    onValChange = e => {
+        this.setState({newValue: {value: e.target.value}});
+        console.log('newValue', this.state.newValue)
+    };
+
+    onSubmit = () => {
+        console.log('777777',this.state.newValue, this.props.houses.house)
+        this.props.updateHouse(this.props.houses.house, this.state.newValue);
     };
 
     render() {
-        let houseData = this.props.houses.houseData;
         const loading = !this.state.optionsHouses[0];
-        houseData = houseData || {homeName: ''};
 
         return (
             <div className="center-block">
-                <h2 className="row justify-content-center login-h2">{loading ? <FontAwesomeIcon icon={faSpinner} spin size="2x" /> : ""}</h2>
+                <h2 className="row justify-content-center login-h2">{loading ?
+                    <FontAwesomeIcon icon={faSpinner} spin size="2x"/> : ""}</h2>
                 {!loading && <Avatar icon={faEdit}/>}
                 {!loading && <Formik
                     validationSchema={HousesSchema}
@@ -85,8 +98,11 @@ class Houses extends Component {
                             </div>
                             <div>
                                 <label htmlFor="editField">Edit house:</label>
-                                <UserInput type={"text"} placeholder={"New house name"} name="edit_house"/>
-                                <UserInput type={"text"} placeholder={"New room name"} name="edit_room"/>
+                                <HouseInput type={"text"} placeholder={"New house name"} name="edit_house"
+                                            //value={this.state.selectedHouse.label}
+                                            onValChange={this.getNewValue}
+                                />
+                                <HouseInput type={"text"} placeholder={"New room name"} name="edit_room"/>
                                 <SubmitButton buttonText={"Edit"}/>
                             </div>
                         </div>
@@ -101,6 +117,7 @@ class Houses extends Component {
 Houses.propTypes = {
     updateHouse: PropTypes.func.isRequired,
     getAllHouses: PropTypes.func.isRequired,
+    setCurrentHouse: PropTypes.func.isRequired,
     houses: PropTypes.object.isRequired,
     errors: PropTypes.object.isRequired,
 };
@@ -112,9 +129,11 @@ const mapStateToProps = state => ({
 function mapDispatchToProps(dispatch) {
     return {
         updateHouse: message => dispatch(updateHouse(message)),
+        setCurrentHouse: selectedHouse => dispatch(setCurrentHouse(selectedHouse)),
         getAllHouses: () => dispatch(getAllHouses())
     }
 }
+
 export default connect(
     mapStateToProps,
     mapDispatchToProps

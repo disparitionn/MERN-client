@@ -10,6 +10,7 @@ const initialState = {
 export default function(state = initialState, action) {
     switch (action.type) {
         case SET_CURRENT_HOUSE:
+            console.log('action.payload',action.payload);
             return {
                 ...state,
                 house: action.payload,

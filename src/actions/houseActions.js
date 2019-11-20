@@ -6,9 +6,9 @@ import {
 } from "./types";
 
 
-export const updateHouse = houseData => dispatch => {
+export const updateHouse = (house, houseData) => dispatch => {
     axios
-        .post("/api/houses/update", houseData)
+        .post("/api/houses/update", house, houseData)
         .catch(err =>
             dispatch({
                 type: GET_ERRORS,
@@ -32,9 +32,9 @@ export const getAllHouses = () => dispatch => {
         );
 };
 
-export const setCurrentHouse = decoded => {
+export const setCurrentHouse = house => {
     return {
         type: SET_CURRENT_HOUSE,
-        payload: decoded
+        payload: house
     };
 };
