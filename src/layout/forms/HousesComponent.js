@@ -67,8 +67,12 @@ class Houses extends Component {
     };
 
     onSubmit = () => {
-        console.log('777777',this.state.newValue, this.props.houses.house)
-        this.props.updateHouse(this.props.houses.house, this.state.newValue);
+        console.log('777777',this.state.newValue, this.props.houses.house);
+        let house = {
+            newName: this.state.newValue.value,
+            id: this.props.houses.house.value
+        };
+        this.props.updateHouse(house);
     };
 
     render() {

@@ -6,9 +6,14 @@ import {
 } from "./types";
 
 
-export const updateHouse = (house, houseData) => dispatch => {
+export const updateHouse = (house) => dispatch => {
+    let request = {
+        id: house.id,
+        newName: house.newName
+    };
+    console.log("ddd", request);
     axios
-        .post("/api/houses/update", house, houseData)
+        .post("/api/houses/update", request)
         .catch(err =>
             dispatch({
                 type: GET_ERRORS,
